@@ -1,0 +1,12 @@
+"/Users/billlin/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/223.8617.54/CLion.app/Contents/bin/cmake/mac/bin/cmake" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=/Users/billlin/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/223.8617.54/CLion.app/Contents/bin/ninja/mac/ninja" -DCMAKE_C_COMPILER=/usr/bin/cc -DCMAKE_CXX_COMPILER=/usr/bin/c++ -G Ninja -S "/Users/billlin/Desktop/Huawei Task" -B "/Users/billlin/Desktop/Huawei Task/cmake-build-debug"
+CMake Warning at /Users/billlin/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/223.8617.54/CLion.app/Contents/bin/cmake/mac/share/cmake-3.24/Modules/Platform/Darwin-Initialize.cmake:109 (message):
+  Could not find any valid SDKs in
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs
+Call Stack (most recent call first):
+  /Users/billlin/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/223.8617.54/CLion.app/Contents/bin/cmake/mac/share/cmake-3.24/Modules/CMakeSystemSpecificInitialize.cmake:21 (include)
+  CMakeLists.txt:2 (project)
+
+
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/billlin/Desktop/Huawei Task/cmake-build-debug

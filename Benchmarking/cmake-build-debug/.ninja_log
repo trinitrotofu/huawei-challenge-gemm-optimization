@@ -1,0 +1,11 @@
+# ninja log v5
+0	254	1689193738707459652	CMakeFiles/Huawei_Task.dir/test_openblas.c.o	c40f14b41389fbad
+1005	1067	1689286400036427098	Huawei_Task	e04e19de651313bf
+0	193	1689195598915119886	CMakeFiles/Huawei_Task.dir/naive.cpp.o	13a8be8240af09bd
+1	320	1688688085143526279	CMakeFiles/Huawei_Task.dir/testing/time_dgemm.c.o	604a141fb210424
+2	617	1689285229231507173	CMakeFiles/Huawei_Task.dir/main.cpp.o	d2a7907767c6a8b3
+0	63	1689194954086988691	CMakeFiles/Huawei_Task.dir/naive.c.o	36581c00fb24aa94
+1	60	1689348792104054838	build.ninja	8aa1506fcd3a3632
+0	491	1689193481966075649	CMakeFiles/Huawei_Task.dir/test_openblas.cpp.o	4fb635c6f62af432
+1	1005	1689286399965956036	CMakeFiles/Huawei_Task.dir/eigen_test.cpp.o	94956cb90581a661
+0	73	1689349097753820151	CMakeFiles/Huawei_Task.dir/openblas.c.o	d755a4a36851cf0b

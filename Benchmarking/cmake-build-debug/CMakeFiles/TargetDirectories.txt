@@ -1,0 +1,3 @@
+/Users/billlin/Desktop/Huawei Task/cmake-build-debug/CMakeFiles/Huawei_Task.dir
+/Users/billlin/Desktop/Huawei Task/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/billlin/Desktop/Huawei Task/cmake-build-debug/CMakeFiles/rebuild_cache.dir
