@@ -1,0 +1,11 @@
+# Ignore all backups
+*~
+
+# Ignore .DS_Store from mac
+.DS_Store
+
+# Ignore .exe from Windows
+*.exe
+
+# Ignore vscode
+.vscode
