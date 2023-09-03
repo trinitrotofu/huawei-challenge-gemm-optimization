@@ -1,1 +1,0 @@
-g++ -O3 -Ofast -march=native main.cpp -o main -lopenblas -lpthread

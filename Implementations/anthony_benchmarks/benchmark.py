@@ -6,7 +6,7 @@ from loguru import logger
 
 
 def get_compile_command() -> str:
-    return "g++ -O3 -Ofast -march=native main.cpp -o main -lopenblas -lpthread"
+    return "g++ -Ofast -march=native main.cpp -o main -lopenblas -lpthread"
 
 
 def get_run_command(input_file: str, ours: bool) -> str:
@@ -50,6 +50,3 @@ if __name__ == "__main__":
     with open("results.json", "w") as f:
         json.dump(results, f)
     logger.debug("Results saved.")
-
-
-
