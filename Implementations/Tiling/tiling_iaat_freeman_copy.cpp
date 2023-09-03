@@ -156,34 +156,16 @@ void call_kernel(const int mc, const int nc, const int m, const int n, const int
     // m, n, k: size of input matrices
     // x, y: x is the topmost row, y is the leftmost column (points to the top-left corner)
     // A, B, C: the matrices
+    // A2, B2 are transposed versions of A, B
 
-    // We need to transpose here because libxsmm uses column-major ordering ONLY
-    
-    // Naively
-    
-    // for (int i = 0; i < mc; i++) {
-    //     for (int j = 0; j < k; j++) {
-    //         A2[j * mc + i] = A[(x + i) * k + j];
-    //     }
-    // }
-    // for (int i = 0; i < k; i++) {
-    //     for (int j = 0; j < nc; j++) {
-    //         B2[j * k + i] = B[i * n + y + j];
-    //     }
-    // }
-
-    for (int i = 0; i < mc; i++) {
-        for (int j = 0; j < k; j++) {
-            A2[i * k + j] = A[(x + i) * k + j];
-        }
-    }
+    // Copy A2[][x:x+mc] to A3
     for (int i = 0; i < k; i++) {
-        for (int j = 0; j < nc; j++) {
-            B2[i * nc + j] = B[i * n + y + j];
-        }
+        memcpy(&A3[i * mc], &A2[i * m + x], sizeof(double) * mc);
     }
-    transpose(A2, A3, mc, k, ROW_MAJOR);
-    transpose(B2, B3, k, nc, ROW_MAJOR);
+    // Copy B2[y:y+nc][] to B3
+    for (int i = 0; i < nc; i++) {
+        memcpy(&B3[i * k], &B2[(y + i) * k], sizeof(double) * k);
+    }
 
     memset(C2, 0, sizeof(double) * mc * nc);
 
@@ -209,6 +191,9 @@ void dgemm(const int m, const int n, const int k, double *__restrict__ const A, 
     memset(tile_col, 0, sizeof(tile_col));
 
     tile_greedy(m, n, k, tile_row, tile_col);
+
+    transpose(A, A2, m, k, ROW_MAJOR);
+    transpose(B, B2, k, n, ROW_MAJOR);
 
     int curr_row = 0;
     for (int i = 0; i < 3; i++) {
@@ -304,7 +289,7 @@ int getint(void)
 }
 
 int main(int argc, char const *argv[])
-{
+{   
     // restrict openblast to a single thread
     openblas_set_num_threads(1);
 
