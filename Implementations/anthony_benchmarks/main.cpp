@@ -1,4 +1,4 @@
-#include "cblas.h"
+#include "include/cblas.h"
 
 #include <sys/time.h>
 #include <iostream>
@@ -30,14 +30,6 @@ void naive(double *A, double *B, double *C, int m, int n, int k)
 
 // use vec as data type for 4-double vector
 typedef double vec __attribute__ ((vector_size(32)));
-
-// allocate n 4-double vectors
-vec* alloc(int n)
-{
-    vec* ptr = (vec*) aligned_alloc(32 * n, 32);
-    memset(ptr, 0, 32 * n);
-    return ptr;
-}
 
 // update C[x:x+8][0:4] using
 // A[x:x+8][l:r] and B[l:r][0:4]
@@ -167,7 +159,6 @@ void kernel_1x4(double *A, vec *B, vec *C, int x, int l, int r, int K)
 }
 
 
-
 // memory aligned 4-double vectors to store temporary data for gemm calls
 // faster to use these instead of allocating memory each time, but comes at the cost
 // of knowing the MAX_SIZE of the arrays beforehand
@@ -176,6 +167,9 @@ alignas(64) vec _B[MAX_SIZE / 4], _C[MAX_SIZE / 4];
 // matrix multiplication when B is transposed and N <= 4
 void multiply_N4(double *A, double *B, double *C, int M, int N, int K)
 {
+    // allocate K memory-aligned 4-double vectors to store matrix B
+//    vec *_B = alloc(K);
+
     // undo Transpose on B and store it in memory aligned array
     for (int i = 0; i < N; i++)
     {
@@ -183,6 +177,10 @@ void multiply_N4(double *A, double *B, double *C, int M, int N, int K)
             _B[j][i] = B[i * K + j];
         }
     }
+
+    // allocate M memory-aligned 4-double vectors to store matrix C
+//    vec *_C = alloc(M);
+
     const int lr = 240;
 
     // go through matrix C 8 rows at a time, and apply 8 row kernel
@@ -198,9 +196,12 @@ void multiply_N4(double *A, double *B, double *C, int M, int N, int K)
     }
 
     // now there is up to 7 rows of C still not calculated
+    // if there are 4 rows not calculated, apply 4 row kernel
     if(row + 4 <= M) {
         // select 120 columns of A and 120 rows of B to call with the kernel
         for(int vals = 0; vals < K; vals += lr) {
+            // call kernel to update _C[vals:vals+8][0:4]
+            // using A[row:row+8][vals:vals+120] and _B[vals:vals+120][0:4]
             kernel_4x4(A, _B, _C, row, vals, min(vals + lr, K), K);
         }
         row += 4;
@@ -208,7 +209,10 @@ void multiply_N4(double *A, double *B, double *C, int M, int N, int K)
 
     // if there are 2 rows not calculated, apply 2 row kernel
     if(row + 2 <= M) {
+        // select 120 columns of A and 120 rows of B to call with the kernel
         for(int vals = 0; vals < K; vals += lr) {
+            // call kernel to update _C[vals:vals+8][0:4]
+            // using A[row:row+8][vals:vals+120] and _B[vals:vals+120][0:4]
             kernel_2x4(A, _B, _C, row, vals, min(vals + lr, K), K);
         }
         row += 2;
@@ -216,13 +220,25 @@ void multiply_N4(double *A, double *B, double *C, int M, int N, int K)
 
     // if there is one row not calculated, apply 1 row kernel
     if(row + 1 <= M) {
+        // select 120 columns of A and 120 rows of B to call with the kernel
         for(int vals = 0; vals < K; vals += lr) {
+            // call kernel to update _C[vals:vals+8][0:4]
+            // using A[row:row+8][vals:vals+120] and _B[vals:vals+120][0:4]
             kernel_1x4(A, _B, _C, row, vals, min(vals + lr, K), K);
         }
     }
 
+    // matrix _C is fully calculated
+    // copy results from _C to result matrix C
     for (int i = 0; i < M; i++)
         memcpy(&C[i * N], &_C[i], sizeof(double) * N);
+
+    // clean _C
+    memset(_C, 0, sizeof(vec) * M);
+
+    // free memory in allocated _B and _C matrices
+//    _aligned_free(_B);
+//    _aligned_free(_C);
 }
 
 
@@ -237,19 +253,22 @@ double A[MAX_SIZE], B[MAX_SIZE], C[MAX_SIZE], D[MAX_SIZE];
 void verify(double *_C, double *_D, int N, int M) {
     for(int i = 0; i < M; i++) {
         for(int j = 0; j < N; j++) {
-            if(fabs(_C[i * N + j] - _D[i * N + j]) > EPS) {
-                printf("mismatch detected, %.10f\n", _C[i * N + j] - _D[i * N + j]);
+            // double e = fabs(_C[i * N + j] - _D[i * N + j]); // Absolute error
+            double e = fabs((_C[i * N + j] - _D[i * N + j]) / _D[i * N + j]); // Relative error
+            if(e > EPS) {
+                printf("mismatch detected, %.10f\n", e);
             }
         }
     }
 }
 
+
+
+
 double test(int m, int k, int n, bool ours)
 {
     struct timeval start, finish;
     gettimeofday(&start, NULL);
-    
-    // if (n > 4) return 0.f;
 
     if (ours) {
         if(n > 4)
@@ -284,8 +303,6 @@ int main(int argc, char const *argv[])
         return 0;
     }
     bool ours = atoi(argv[1]);
-    // if (ours) printf("Running our implementation\n");
-    // else printf("Running OpenBLAS implementation\n");
 
     // restrict openblast to a single thread
     openblas_set_num_threads(1);
@@ -508,5 +525,3 @@ int main(int argc, char const *argv[])
 //    for (int i = 0; i < M; i++)
 //        memcpy(&C[i * N], &_C[i * N8], 8 * N);
 //}
-
-// g++ UPDATED_implementation_N_leq_4.cpp -o anthony -lopenblas -lpthread -Ofast -march=native
