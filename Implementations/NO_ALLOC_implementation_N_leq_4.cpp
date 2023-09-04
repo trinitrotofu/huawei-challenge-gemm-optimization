@@ -233,6 +233,9 @@ void multiply_N4(double *A, double *B, double *C, int M, int N, int K)
     for (int i = 0; i < M; i++)
         memcpy(&C[i * N], &_C[i], sizeof(double) * N);
 
+    // clean _C
+    memset(_C, 0, sizeof(vec) * M);
+
     // free memory in allocated _B and _C matrices
 //    _aligned_free(_B);
 //    _aligned_free(_C);
@@ -250,8 +253,10 @@ double A[MAX_SIZE], B[MAX_SIZE], C[MAX_SIZE], D[MAX_SIZE];
 void verify(double *_C, double *_D, int N, int M) {
     for(int i = 0; i < M; i++) {
         for(int j = 0; j < N; j++) {
-            if(fabs(_C[i * N + j] - _D[i * N + j]) > EPS) {
-                printf("mismatch detected, %.10f\n", _C[i * N + j] - _D[i * N + j]);
+            // double e = fabs(_C[i * N + j] - _D[i * N + j]); // Absolute error
+            double e = fabs((_C[i * N + j] - _D[i * N + j]) / _D[i * N + j]); // Relative error
+            if(e > EPS) {
+                printf("mismatch detected, %.10f\n", e);
             }
         }
     }
