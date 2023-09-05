@@ -150,7 +150,7 @@ void debug(double *A, int n, int m) {
     }
 }
 
-// Naively computes C[x:x+mc][y:y+nc]
+// Computes C[x:x+mc][y:y+nc]
 void call_kernel(const int mc, const int nc, const int m, const int n, const int k, const int x, const int y, double *__restrict__ const A, double *__restrict__ const B, double *__restrict__ const C) {
     // mc, nc: kernel size
     // m, n, k: size of input matrices
