@@ -8,6 +8,6 @@ Implementation 3: ([tiling_iaat_freeman_copy.cpp](https://github.com/trinitrotof
 
 Our main implementation and the one with the best results is Implementation 1.
 
-Test data, provided by Huawei is located [here](https://github.com/trinitrotofu/huawei-challenge-gemm-optimization/tree/main/Benchmarking/gemm_inputs)
+Test data, provided by Huawei is located [here.](https://github.com/trinitrotofu/huawei-challenge-gemm-optimization/tree/main/Benchmarking/gemm_inputs)
 
 Implementation 1 achieved an average performance improvement of 5.46% over OpenBLAS on the given input data.
